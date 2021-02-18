@@ -26,7 +26,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
      * @param registry
      */
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+        public void addInterceptors(InterceptorRegistry registry) {
         logger.info("jwtInterceptor init!!!");
         JWTInterceptor jwtInterceptor = new JWTInterceptor();
         List<String> pathPatterns = new ArrayList<>();

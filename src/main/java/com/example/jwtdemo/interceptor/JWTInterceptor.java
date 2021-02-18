@@ -47,7 +47,7 @@ public class JWTInterceptor implements HandlerInterceptor {
      * @throws Exception
      */
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         logger.info("postHandle------>");
     }
 
