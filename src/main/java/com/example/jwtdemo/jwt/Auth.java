@@ -1,6 +1,7 @@
 package com.example.jwtdemo.jwt;
 
 import com.example.jwtdemo.filter.JWTCheckFilter;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Encoders;
@@ -18,6 +19,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyPair;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("auth")
@@ -26,6 +29,8 @@ public class Auth {
 
     /**
      *使用HS256对称加密算法时，签名密钥和解密密钥必须相同
+     *
+     * 使用随机数字生成key(使用随机数字 new 一个 SecretKeySpec )
      */
     private final static Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
@@ -70,9 +75,13 @@ public class Auth {
         logger.info("key1 -->{}",key.toString());
         logger.info("key2 -->{}",new String(key.getEncoded()));
         logger.info("key3 -->{}", Encoders.BASE64.encode(key.getEncoded()));
+        Map<String,Object> claims = new HashMap<>();
+        claims.put("name","zjsmg");
 
         SecretKey secretKey = new SecretKeySpec(Base64.getDecoder().decode(secreKey), SignatureAlgorithm.HS256.getJcaName());
-        return Jwts.builder().setSubject("jwtDemo").signWith(secretKey,SignatureAlgorithm.HS256).compact();
+//         根据key生成密钥（会根据字节参数长度自动选择相应的 HMAC 算法）
+//        SecretKey secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secreKey));
+        return Jwts.builder().setSubject("jwtDemo").addClaims(claims).signWith(secretKey,SignatureAlgorithm.HS256).compact();
     }
 
     /**
@@ -81,7 +90,9 @@ public class Auth {
      */
     public static void parseJws2(String jws){
         SecretKey secretKey = new SecretKeySpec(Base64.getDecoder().decode(secreKey),SignatureAlgorithm.HS256.getJcaName());
-        Assert.isTrue(Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(jws).getBody().getSubject().equals("jwtDemo"),"token校验失败");
+        Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(jws).getBody();
+        logger.info("---->{}",claims.toString());
+        Assert.isTrue(claims.getSubject().equals("jwtDemo"),"token校验失败");
     }
 
     public static void main(String[] args) {
